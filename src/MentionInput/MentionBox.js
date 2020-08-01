@@ -30,6 +30,16 @@ const styles = StyleSheet.create({
 class MentionBox extends React.Component {
 
   render() {
+    if (this.props.isLoading === true) {
+      return (
+        <View style={[styles.mainContainer, this.props.style, { height: 70}]}>
+          <View style={styles.subContainer}>
+            {this.props.loadingComponent}
+          </View>
+        </View>
+      )
+    }
+
     if (this.props.data.length === 0) {
       return (
         <View style={[styles.mainContainer, this.props.style]}>

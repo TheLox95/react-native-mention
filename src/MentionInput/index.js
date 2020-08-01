@@ -1,9 +1,10 @@
 import React, { Fragment } from 'react'
 import ParsedText from 'react-native-parsed-text'
-import { Keyboard, TextInput, TouchableOpacity } from 'react-native'
+import { Keyboard, TextInput, TouchableOpacity, Text, View } from 'react-native'
 
 import styles from './styles'
 import MentionBox, { HEIGHT } from './MentionBox'
+import colors from 'react-native-mention/src/constants/colors'
 
 class MentionInput extends React.PureComponent {
   constructor(props) {
@@ -18,6 +19,7 @@ class MentionInput extends React.PureComponent {
     this.state = {
       text: '',
       showMentionBox: false,
+      dataToSearch: this.props.mentionData,
       isInputFieldActive: false,
       mentionBoxDimension: {
         top: 0,
@@ -26,6 +28,22 @@ class MentionInput extends React.PureComponent {
         height: HEIGHT
       }
     }
+  }
+
+  getUser = () => {
+    const words = this.state.text.split(" ")
+
+    return words
+      .filter(w => this.props.mentionData.find(d => d.name == w.replace("@", "")))
+      .map(w => this.props.mentionData.find(d => d.name == w.replace("@", "")))
+  }
+
+  getHashtags = () => {
+    const words = this.state.text.split(" ")
+
+    return words
+      .filter(w => this.props.hashtagData.find(d => d.name == w.replace("#", "")))
+      .map(w => this.props.hashtagData.find(d => d.name == w.replace("#", "")))
   }
 
   /**
@@ -41,7 +59,7 @@ class MentionInput extends React.PureComponent {
     let wordRelativeIndex = 0
 
     return words.map((word, index) => {
-      const hasToMention = word.includes("@")
+      const hasToMention = word.includes("@") || word.includes("#")
       const wordAbsoluteIndex = index
       const wordLength = word.length
       if (index > 0) {
@@ -77,9 +95,14 @@ class MentionInput extends React.PureComponent {
     const wordAtCursor = this.mainData.find(item => item.isCursorActive)
 
     if (wordAtCursor && wordAtCursor.hasToMention) {
-      this.setState({ showMentionBox: true })
-      const words = wordAtCursor.word.split('@')
-      this.props.mentioningChangeText(words[words.length - 1])
+      if (wordAtCursor.word.includes('@')) {
+        this.setState({ showMentionBox: true, dataToSearch: this.props.mentionData })
+        const words = wordAtCursor.word.split('@')
+        this.props.mentioningChangeText(words[words.length - 1])
+      } else {
+        this.setState({ showMentionBox: true, dataToSearch: this.props.hashtagData })
+        const words = wordAtCursor.word.split('')
+      }
     } else {
       this.setState({ showMentionBox: false })
     }
@@ -111,7 +134,15 @@ class MentionInput extends React.PureComponent {
     this.mainData = this.mainData.map(data => {
       if (data.isCursorActive) {
         const words = data.word.split('@')
-        const word = data.word.replace(`@${words[words.length - 1]}`, `@${item.name}`)
+        let word = data.word.replace(`@${words[words.length - 1]}`, `@${item.name}`)
+
+        if (data.word.includes('#')) {
+          const words = data.word.split('#')
+          word = data.word.replace(`#${words[words.length - 1]}`, `#${item.name}`)
+          this.props.onHashtagSelected(item)
+        } else {
+          this.props.onMentionSelected(item)
+        }
 
         return {
           ...data,
@@ -127,6 +158,7 @@ class MentionInput extends React.PureComponent {
       const space = index === 0 ? '' : ' '
       combinedText = combinedText + space + word.word
     })
+    combinedText = combinedText + ' '
     this.setState({ text: combinedText })
     this.props.onChangeText(combinedText)
   }
@@ -192,12 +224,22 @@ class MentionInput extends React.PureComponent {
               parse={[
                 {
                   pattern: /@[A-Za-z0-9._-]*/,
-                  style: styles.username,
-                  onPress: this.handleNamePress
+                  onPress: this.handleNamePress,
+                  renderText: (matchingString) => {
+                    if (this.props.mentionData.find(d => d.name == matchingString.replace('@', ''))) {
+                      return <Text style={styles.username}>{matchingString}</Text>
+                    }
+                    return <Text style={{ color: 'black' }}>{matchingString}</Text>
+                  }
                 },
                 {
                   pattern: /#(\w+)/,
-                  style: styles.hashTag
+                  renderText: (matchingString) => {
+                    if (this.props.hashtagData.find(d => d.name == matchingString.replace('#', ''))) {
+                      return <Text style={styles.hashTag}>{matchingString}</Text>
+                    }
+                    return <Text style={{ color: 'black' }}>{matchingString}</Text>
+                  }
                 }
               ]}
             >
@@ -207,7 +249,9 @@ class MentionInput extends React.PureComponent {
         </Fragment>
         {this.state.showMentionBox && (
           <MentionBox
-            data={this.props.mentionData}
+            isLoading={this.props.isLoading}
+            loadingComponent={this.props.loadingComponent}
+            data={this.state.dataToSearch}
             style={this.state.mentionBoxDimension}
             renderCell={({ item, index }) => (
               <TouchableOpacity onPress={() => this.onCellPress(item)}>
