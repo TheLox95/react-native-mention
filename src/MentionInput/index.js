@@ -234,12 +234,7 @@ class MentionInput extends React.PureComponent {
                 },
                 {
                   pattern: /#(\w+)/,
-                  renderText: (matchingString) => {
-                    if (this.props.hashtagData.find(d => d.name == matchingString.replace('#', ''))) {
-                      return <Text style={styles.hashTag}>{matchingString}</Text>
-                    }
-                    return <Text style={{ color: 'black' }}>{matchingString}</Text>
-                  }
+                  renderText: (matchingString) => <Text style={styles.hashTag}>{matchingString}</Text>
                 }
               ]}
             >
