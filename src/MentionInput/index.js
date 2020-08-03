@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react'
 import ParsedText from 'react-native-parsed-text'
-import { Keyboard, TextInput, TouchableOpacity, Text, View } from 'react-native'
+import { Keyboard, TouchableOpacity, Text, View } from 'react-native'
+import { Input as TextInput } from 'native-base';
 
 import styles from './styles'
 import MentionBox, { HEIGHT } from './MentionBox'

@@ -32,5 +32,8 @@
   },
   "devDependencies": {
     "metro-react-native-babel-preset": "^0.57.0"
+  },
+  "peerDependencies": {
+    "native-base": "^2.13.12"
   }
 }
