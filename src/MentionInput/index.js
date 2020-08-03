@@ -100,13 +100,15 @@ class MentionInput extends React.PureComponent {
     const wordAtCursor = this.mainData.find(item => item.isCursorActive)
 
     if (wordAtCursor && wordAtCursor.hasToMention) {
-      if (wordAtCursor.word.includes('@') && this.keywordIsOnData(wordAtCursor.word.replace("@"), this.props.mentionData)) {
+      if (wordAtCursor.word.includes('@') && this.keywordIsOnData(wordAtCursor.word.replace("@",""), this.props.mentionData)) {
         this.setState({ showMentionBox: true, dataToSearch: this.props.mentionData })
         const words = wordAtCursor.word.split('@')
         this.props.mentioningChangeText(words[words.length - 1])
-      } else if(this.keywordIsOnData(wordAtCursor.word.replace("#"), this.props.hashtagData)) {
+      } else if(this.keywordIsOnData(wordAtCursor.word.replace("#",""), this.props.hashtagData)) {
         this.setState({ showMentionBox: true, dataToSearch: this.props.hashtagData })
         const words = wordAtCursor.word.split('')
+      } else {
+        this.setState({ showMentionBox: false })
       }
     } else {
       this.setState({ showMentionBox: false })
