@@ -4,7 +4,7 @@ import { Keyboard, TextInput, TouchableOpacity, Text, View } from 'react-native'
 
 import styles from './styles'
 import MentionBox, { HEIGHT } from './MentionBox'
-import colors from 'react-native-mention/src/constants/colors'
+import FuzzySearch from 'fuzzy-search'; // Or: var FuzzySearch = require('fuzzy-search');
 
 class MentionInput extends React.PureComponent {
   constructor(props) {
@@ -47,7 +47,8 @@ class MentionInput extends React.PureComponent {
   }
 
   keywordIsOnData = (keyword, data) => {
-    return data.find(d => d.name == keyword) != null
+    const searcher = new FuzzySearch(data, ['name']);
+    return searcher.search(keyword).length != 0
   }
 
   /**
