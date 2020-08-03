@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
     // backgroundColor: 'blue'
   },
   inputField: {
+    padding: '4%'
     // backgroundColor: 'red'
     // color: colors.transparent
   },
