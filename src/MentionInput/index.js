@@ -46,6 +46,10 @@ class MentionInput extends React.PureComponent {
       .map(w => this.props.hashtagData.find(d => d.name == w.replace("#", "")))
   }
 
+  keywordIsOnData = (keyword, data) => {
+    return data.find(d => d.name == keyword) != null
+  }
+
   /**
    * Text field on change text event callback
    */
@@ -95,11 +99,11 @@ class MentionInput extends React.PureComponent {
     const wordAtCursor = this.mainData.find(item => item.isCursorActive)
 
     if (wordAtCursor && wordAtCursor.hasToMention) {
-      if (wordAtCursor.word.includes('@')) {
+      if (wordAtCursor.word.includes('@') && this.keywordIsOnData(wordAtCursor.word.replace("@"), this.props.mentionData)) {
         this.setState({ showMentionBox: true, dataToSearch: this.props.mentionData })
         const words = wordAtCursor.word.split('@')
         this.props.mentioningChangeText(words[words.length - 1])
-      } else {
+      } else if(this.keywordIsOnData(wordAtCursor.word.replace("#"), this.props.hashtagData)) {
         this.setState({ showMentionBox: true, dataToSearch: this.props.hashtagData })
         const words = wordAtCursor.word.split('')
       }
