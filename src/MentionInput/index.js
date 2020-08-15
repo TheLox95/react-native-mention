@@ -31,6 +31,8 @@ class MentionInput extends React.PureComponent {
     }
   }
 
+  clearInput = () => this.setState({ text: ''})
+
   getUser = () => {
     const words = this.state.text.split(" ")
 
